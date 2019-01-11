@@ -7,3 +7,6 @@ edition = "2018"
 [dependencies]
 iron = "*"
 router = "*"
+rust-crypto = "*"
+rustc-serialize = "*"
+json_macro = "*"
