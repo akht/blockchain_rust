@@ -1,23 +1,21 @@
+extern crate crypto;
 extern crate iron;
 extern crate router;
-extern crate crypto;
 extern crate rustc_serialize;
 
+use crypto::digest::Digest;
+use crypto::sha2::Sha256;
 use iron::prelude::*;
 use iron::status;
 use router::Router;
-use std::io::Read;
-use std::collections::HashSet;
-use std::time::SystemTime;
 use rustc_serialize::hex::ToHex;
-use crypto::digest::Digest;
-use crypto::sha2::Sha256;
+use std::collections::HashSet;
+use std::io::Read;
+use std::time::SystemTime;
 
 fn main() {
     let blockchain = Blockchain::new();
     println!("{:?}", blockchain);
-
-
 
     let mut router = Router::new();
 
@@ -109,16 +107,15 @@ impl Blockchain {
             }
         });
 
-        let mut last_block = self.last_block();
+        let mut last_block = self.chain[&self.chain.len() - 1].clone();
         last_block.index += 1;
-        last_block.index
-    }
 
-    fn last_block(self) -> Block {
-        // let clone = self.chain[self.chain.len() - 1].clone();
-        // clone
+        let index = last_block.index;
 
-        self.chain[self.chain.len() - 1]
+        self.chain.remove(&self.chain.len() - 1);
+        self.chain.push(last_block);
+
+        index
     }
 
     fn hash(&self, block: &Block) -> String {
@@ -128,7 +125,6 @@ impl Blockchain {
         sha256.result_str().as_bytes().to_hex()
     }
 }
-
 
 #[derive(Clone, Debug)]
 struct Block {
